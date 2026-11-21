@@ -60,7 +60,7 @@
 Панель 3X-UI, все протоколы на порту 443 и одна подписка на всё:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scripts/kit.sh)
+bash <(curl -fsSL [https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scripts/kit.sh](https://raw.githubusercontent.com/adminxp/3X-UI_KIT/refs/heads/main/scripts/kit.sh))
 ```
 
 Через пару минут скрипт покажет адрес панели, логин, пароль и подписку с QR-кодом.
@@ -80,79 +80,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scr
 > Обновляйте панель и ядро только через `kit` («Обновить kit и подписку»). Пункт обновления в меню `x-ui` ставит самую новую панель вместе с самым новым ядром Xray, на котором часть приложений (Karing, Hiddify и другие на sing-box) перестаёт подключаться. Если уже обновили через `x-ui`: `kit` → «Проверка сервера» → «Исправить безопасное» вернёт проверенное ядро.
 
 Все команды (для скриптов и тех, кому так привычнее) и разбор «Если не подключается» – в **[инструкции](manuals/3x-ui.md)**.
-
-## VPN на роутере
-
-Через прокси идут только нужные сервисы и выбранные устройства, остальное работает напрямую.
-Порядок: **1.** установить программу на роутер → **2.** собрать конфиг в [генераторе](#генератор-конфигов-для-роутера) →
-**3.** вставить команду из генератора.
-
-Если GitHub недоступен, замените адрес на `https://cdn.jsdelivr.net/gh/jameszeroX/XKeen@main/install.sh`.
-Установщик спросит ядро (Xray или Mihomo), геобазы и автозагрузку.
-
-Затем соберите конфиг в [генераторе](#генератор-конфигов-для-роутера) (роутер Keenetic, нужное ядро), вставьте команду в SSH-консоль
-и нажмите Enter: файлы запишутся, XKeen перезапустится.
-
-![Конфигурационные файлы Xray](manuals/assets/xkeen-configs.svg)
-
-</details>
-
-<details>
-<summary><b>7. Какие устройства через прокси</b></summary>
-
-В веб-интерфейсе откройте **Приоритеты подключений → Политики доступа в Интернет**, создайте политику
-с именем **`xkeen`** и перенесите в неё нужные устройства.
-
-> [!WARNING]
-> Без политики `xkeen` через прокси пойдёт трафик **всех** устройств в сети.
-
-</details>
-
-<details>
-<summary><b>8. Проверка</b></summary>
-
-- На роутере: `xkeen -status` – XKeen должен быть запущен.
-- На устройстве из политики `xkeen` откройте сайт, показывающий IP-адрес: он должен совпасть с адресом вашего сервера,
-  а на остальных устройствах остаться прежним.
-- Удобнее управлять настройками из браузера через [XKeen UI](https://github.com/zxc-rv/XKeen-UI).
-
-</details>
-
-Подробная версия с теми же шагами: [инструкция для Keenetic](manuals/xkeen-keenetic.md).
-
-</details>
-
-## Генератор конфигов для роутера
-
-Вставьте ссылку на сервер или подписку, выберите роутер и ядро, отметьте нужные сервисы –
-и получите готовый конфиг и одну команду, которая сама положит его на роутер.
-Всё считается в браузере, ссылки никуда не отправляются.
-Как поставить XKeen на роутер – в разделе [VPN на роутере](#vpn-на-роутере).
-
-| Роутер | Ядро | Что получится | Генератор |
-|---|---|---|---|
-| Keenetic (XKeen) | Xray | `04_outbounds.json` и `05_routing.json`: серверы, выбор сервисов, реклама, свои сайты | [Открыть →](https://itsnotkubrick.github.io/3X-UI_KIT/tools/?core=xray) |
-| Keenetic (XKeen) | Mihomo | `config.yaml` с автовыбором сервера, подпиской, Hysteria2, AmneziaWG и веб-панелью | [Открыть →](https://itsnotkubrick.github.io/3X-UI_KIT/tools/?core=mihomo) |
-| OpenWrt (Nikki), бета | Mihomo | профиль для Nikki и команда, которая его включит | [Открыть →](https://itsnotkubrick.github.io/3X-UI_KIT/tools/?router=openwrt) |
-
-## Полезное
-
-- [XKeen](https://github.com/jameszeroX/XKeen) и его [вики](https://github.com/jameszeroX/XKeen/wiki) – документация по маршрутизации на Keenetic
-- [XKeen UI](https://github.com/zxc-rv/XKeen-UI) – веб-интерфейс для XKeen
-- [IP-адреса для AmneziaWG](https://github.com/RockBlack-VPN/ip-address) – актуальные списки от RockBlack
-
-## Поддержать проект
-
-Скрипты и инструкции бесплатные. Донат добровольный – он помогает оплачивать
-тестовые серверы и держать скрипты в актуальном состоянии. Спасибо! 💜
-
-| Способ | |
-|---|---|
-| Российской картой, СБП, Tinkoff Pay | [Tribute](https://t.me/tribute/app?startapp=dRsY) |
-| Зарубежной картой, Apple Pay, Google Pay | [Buy Me a Coffee](https://buymeacoffee.com/itsnotkubrick) |
-| USDT (TRC-20) | `TS83ViXrdezUpp1eFadqj1rBhGLZaba1c1` |
-| TON | `UQBchO4XFPwF9MMa_tjXpwqTo8IL2FhUDyllhYuFo8WM-Qbf` |
-| Ethereum (ERC-20) | `0xC06F6B3A029d7Ea00705B7028490744e2BC16799` |
 
 Лицензия: MIT, см. [LICENSE](LICENSE). Сторонние компоненты – [NOTICE.md](NOTICE.md).
 
