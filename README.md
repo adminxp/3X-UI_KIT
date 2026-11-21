@@ -60,7 +60,7 @@
 Панель 3X-UI, все протоколы на порту 443 и одна подписка на всё:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/refs/heads/main/3x-ui.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scripts/kit.sh)
 ```
 
 Через пару минут скрипт покажет адрес панели, логин, пароль и подписку с QR-кодом.
@@ -86,82 +86,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/refs/heads
 Через прокси идут только нужные сервисы и выбранные устройства, остальное работает напрямую.
 Порядок: **1.** установить программу на роутер → **2.** собрать конфиг в [генераторе](#генератор-конфигов-для-роутера) →
 **3.** вставить команду из генератора.
-
-> [!NOTE]
-> На роутере работает [XKeen](https://github.com/jameszeroX/XKeen) автора jameszeroX, спасибо ему.
-
-<details>
-<summary><b>📶 Keenetic: XKeen (jameszeroX) · 8 шагов, 20–30 минут</b></summary>
-
-Нужны роутер **Keenetic** или **Netcraze** с USB-портом, USB-флешка в формате **ext4** и свой сервер с VLESS
-(например, из [этой инструкции](manuals/3x-ui.md)).
-
-<details>
-<summary><b>1. Компоненты KeeneticOS</b></summary>
-
-В веб-интерфейсе: **Управление → Общие настройки → Изменить набор компонентов**. Отметьте компоненты
-с галочками на картинке и установите. Роутер обновится и перезагрузится.
-
-![Нужные компоненты KeeneticOS](manuals/assets/keenetic-components.svg)
-
-</details>
-
-<details>
-<summary><b>2. Entware на флешку</b></summary>
-
-1. Отформатируйте флешку в **ext4** и вставьте её в роутер.
-2. Откройте её по сети (`\\192.168.x.x\`), создайте папку `install` и положите туда установщик под процессор роутера:
-   [mipsel](https://bin.entware.net/mipselsf-k3.4/installer/mipsel-installer.tar.gz),
-   [mips](https://bin.entware.net/mipssf-k3.4/installer/mips-installer.tar.gz) или
-   [aarch64](https://bin.entware.net/aarch64-k3.10/installer/aarch64-installer.tar.gz).
-   Не знаете, какой нужен? Модель роутера – в характеристиках на сайте Keenetic.
-
-![Установщик Entware на флешке](manuals/assets/entware-installer.svg)
-
-3. **Управление → OPKG**: выберите флешку и сохраните. Установка займёт несколько минут.
-
-![Выбор накопителя для OPKG](manuals/assets/keenetic-opkg.svg)
-
-</details>
-
-<details>
-<summary><b>3. Подключение по SSH</b></summary>
-
-```bash
-ssh root@192.168.x.x -p 222
-```
-
-Пароль по умолчанию `keenetic`. **Сразу смените его** командой `passwd`.
-
-</details>
-
-<details>
-<summary><b>4. Шифрованный DNS</b></summary>
-
-Пропишите шифрованные DNS-серверы (DoT или DoH) по
-[инструкции Keenetic](https://support.keenetic.ru/ultra/kn-1811/ru/31543-dot-and-doh-proxy-servers-for-dns-requests-encryption.html):
-без этого XKeen работает неправильно.
-
-</details>
-
-<details>
-<summary><b>5. Токен для KeeneticOS 5.2 и новее</b></summary>
-
-XKeen нужен токен доступа к роутеру. Создайте его в разделе **Пользователи и доступ**, вставьте в
-[шаблон xkeen.json](https://github.com/jameszeroX/XKeen/releases/download/2.0.1_Beta/xkeen.json) и положите файл на роутер
-по пути `/opt/etc/xkeen/xkeen.json`. Подробнее – в [вики XKeen](https://github.com/jameszeroX/XKeen/wiki/Порядок-установки).
-
-</details>
-
-<details>
-<summary><b>6. Установка XKeen</b></summary>
-
-Подключитесь по SSH и выполните:
-
-```bash
-opkg update && opkg upgrade && opkg install curl tar && cd /tmp
-sh -c "$(curl -sSL https://raw.githubusercontent.com/jameszeroX/XKeen/main/install.sh)"
-```
 
 Если GitHub недоступен, замените адрес на `https://cdn.jsdelivr.net/gh/jameszeroX/XKeen@main/install.sh`.
 Установщик спросит ядро (Xray или Mihomo), геобазы и автозагрузку.
