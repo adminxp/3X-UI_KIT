@@ -4,13 +4,6 @@
 
 **Установка 3X-UI одной командой: 11 протоколов, один порт 443, одна подписка на всё**
 
-[![Версия](https://img.shields.io/github/v/release/itsnotkubrick/3X-UI_KIT?label=3X-UI%20KIT&color=93E06F&labelColor=221B17)](https://github.com/itsnotkubrick/3X-UI_KIT/releases/latest)
-[![Протоколов](https://img.shields.io/badge/протоколов-11-93E06F?labelColor=221B17)](manuals/3x-ui.md#протоколы)
-[![3X-UI](https://img.shields.io/badge/3X--UI-v3.9.0-93E06F?labelColor=221B17)](https://github.com/MHSanaei/3x-ui)
-[![Звёзды](https://img.shields.io/github/stars/itsnotkubrick/3X-UI_KIT?label=звёзды&style=flat&color=93E06F&labelColor=221B17)](https://github.com/itsnotkubrick/3X-UI_KIT/stargazers)
-[![Обновлено](https://img.shields.io/github/last-commit/itsnotkubrick/3X-UI_KIT?label=обновлено&color=93E06F&labelColor=221B17)](https://github.com/itsnotkubrick/3X-UI_KIT/commits)
-[![Поддержать](https://img.shields.io/badge/поддержать-💜-8A66C4?labelColor=221B17)](#поддержать-проект)
-
 </div>
 ## Установка
 
@@ -34,10 +27,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/blob/main/
 официальную панель [3X-UI](https://github.com/MHSanaei/3x-ui), настраивает все популярные
 протоколы, сертификат и файрвол и выдаёт одну ссылку-подписку. Её можно вставить в любое
 приложение – оно само получит подходящие ему протоколы. Домен не нужен.
-
-<div align="center">
-<img alt="Конец установки 3X-UI KIT" src="manuals/assets/script-3x-ui.svg" width="760">
-</div>
 
 ## Возможности
 
