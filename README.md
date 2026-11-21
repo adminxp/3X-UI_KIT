@@ -66,9 +66,6 @@
 - VPS с **Ubuntu 22.04/24.04** или **Debian 12/13** и доступом root по SSH
 - Свободные порты **443** и **80** – на свежем сервере они свободны
 
-Нужен VPS? Я сам использую **[IS Hosting](https://ishosting.io/affiliate/NTg4MiM4)** и рекомендую его
-(реферальная ссылка).
-
 ## Установка
 
 Подключитесь к серверу по SSH и выполните одну команду на чистом VPS.
@@ -76,7 +73,7 @@
 Панель 3X-UI, все протоколы на порту 443 и одна подписка на всё:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scripts/3x-ui.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/refs/heads/main/scripts/kit.sh)
 ```
 
 Через пару минут скрипт покажет адрес панели, логин, пароль и подписку с QR-кодом.
