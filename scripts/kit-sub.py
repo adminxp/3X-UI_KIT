@@ -8,7 +8,9 @@ https://github.com/itsnotkubrick/3X-UI_KIT
     из подписки «<id>-awg»: Mihomo умеет AmneziaWG, а остальные приложения нет;
   * остальные приложения и браузер – ответ 3X-UI как есть (ссылки или страница);
   * заголовок Subscription-Userinfo: expire=0 («бессрочно») убирается – иначе
-    приложения показывают срок «01.01.1970».
+    приложения показывают срок «01.01.1970»;
+  * прозрачный проброс HWID-заголовков клиентов (Happ, Hiddify, Karing, v2rayN и др.)
+    в 3X-UI для учёта и ограничения устройств.
 
 Настройки – /etc/kit-sub/config.json. Сертификат перечитывается сам после продления.
 """
@@ -52,13 +54,23 @@ def upstream_ua(ua):
 SUB_ID = re.compile(r"^[A-Za-z0-9_.@-]{1,64}$")
 # Страница подписки для браузера (React от 3X-UI) подгружает скрипты и стили из «<путь>/assets/…»: пропускаем только такие файлы.
 ASSET = re.compile(r"^assets/[A-Za-z0-9_.-]{1,128}\.(js|css|woff2?|svg|png|ico|map)$")
+# Заголовки устройств, которые клиенты (Happ, Hiddify, Karing, v2rayN) передают при запросе подписки.
+CLIENT_HWID_HEADERS = (
+    "x-hwid",
+    "x-device-os",
+    "x-ver-os",
+    "x-device-model",
+    "x-app-version",
+    "hwid",
+)
 # Заголовки Happ, которые 3X-UI отдаёт в подписке (маршрутизация, баннеры, настройки клиента).
 HAPP_HEADERS = ("routing", "routing-enable", "announce", "providerid", "new-url", "fallback-url",
                 "hide-settings", "no-limit-enabled", "ping-type", "color-profile", "tun-mode", "tun-type",
                 "exclude-routes", "exclude-apns-enable", "per-app-proxy-mode", "per-app-proxy-list",
                 "notification-subs-expire", "sub-expire", "sub-expire-button-link", "sub-info-text",
                 "sub-info-color", "sub-info-button-text", "sub-info-button-link",
-                "subscription-autoconnect", "subscription-autoconnect-type", "subscription-always-hwid-enable")
+                "subscription-autoconnect", "subscription-autoconnect-type", "subscription-always-hwid-enable",
+                "hwid-limit", "device-limit")
 PASS_HEADERS = ("content-type", "content-disposition", "profile-title", "profile-update-interval",
                 "profile-web-page-url", "subscription-userinfo", "support-url", "cache-control") + HAPP_HEADERS
 
@@ -86,10 +98,23 @@ def log(msg):
     print(msg, flush=True)
 
 
-def upstream(sub_id, ua, host, accept, prefix=None):
-    """GET к подписке 3X-UI. Возвращает (код, заголовки, тело) или (None, {}, b"")."""
-    req = urllib.request.Request(CONF["upstream"].rstrip("/") + (prefix or PATH) + sub_id, headers={
-        "User-Agent": ua, "Host": host, "Accept": accept or "*/*"})
+def upstream(sub_id, ua, host, accept, prefix=None, client_headers=None):
+    """GET к подписке 3X-UI с пробросом HWID-заголовков клиента. Возвращает (код, заголовки, тело) или (None, {}, b"")."""
+    req_headers = {
+        "User-Agent": ua,
+        "Host": host,
+        "Accept": accept or "*/*",
+    }
+    if client_headers:
+        for h in CLIENT_HWID_HEADERS:
+            val = client_headers.get(h)
+            if val and "\r" not in val and "\n" not in val:
+                req_headers[h] = val
+
+    req = urllib.request.Request(
+        CONF["upstream"].rstrip("/") + (prefix or PATH) + sub_id,
+        headers=req_headers,
+    )
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return r.status, {k.lower(): v for k, v in r.getheaders()}, r.read()
@@ -458,20 +483,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
         ua = self.headers.get("User-Agent", "")
         host = CONF.get("link_host") or self.headers.get("Host", CONF.get("host", ""))
         accept = self.headers.get("Accept", "")
-        code, headers, body = upstream(sub_id, upstream_ua(ua), host, accept, prefix)
+        code, headers, body = upstream(sub_id, upstream_ua(ua), host, accept, prefix, self.headers)
         if code is None:
             return self.send_html_error(502)
 
         clash = (bool(CLASH_UA.search(ua)) or prefix != PATH) and "yaml" in headers.get("content-type", "")
         awg = clash and not NO_AWG_UA.search(ua)
-        # В журнал – только приложение и что ему отдали, без IP.
-        log(f"{ua[:80]!r} → {'clash+awg' if awg else 'clash' if clash else headers.get('content-type', '?').split(';')[0]}")
+        hwid_tag = " [hwid]" if any(self.headers.get(h) for h in CLIENT_HWID_HEADERS) else ""
+        # В журнал – только приложение, наличие HWID и что ему отдали, без IP.
+        log(f"{ua[:80]!r}{hwid_tag} → {'clash+awg' if awg else 'clash' if clash else headers.get('content-type', '?').split(';')[0]}")
         try:
             if code == 200 and clash and not awg:
                 body = strip_awg(body)
             elif code == 200 and awg and not sub_id.endswith(("-awg", "-tg")):
                 # Установки до kit 1.1 держали AmneziaWG в подписке «<id>-awg» – подмешиваем её.
-                acode, _, abody = upstream(sub_id + "-awg", ua, host, accept, prefix)
+                acode, _, abody = upstream(sub_id + "-awg", ua, host, accept, prefix, self.headers)
                 if acode == 200 and abody:
                     body = merge_awg(body, abody)
             elif code == 200 and ("json" in headers.get("content-type", "") or (
@@ -499,6 +525,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 v = fix_userinfo(headers[k]) if k == "subscription-userinfo" else headers[k]
                 if v and "\r" not in v and "\n" not in v:
                     self.send_header(k.title(), v)
+        if CONF.get("always_hwid", True) and "subscription-always-hwid-enable" not in headers:
+            self.send_header("Subscription-Always-Hwid-Enable", "true")
         self.send_header("Content-Length", str(len(body)))
         self.send_connection()
         self.end_headers()
