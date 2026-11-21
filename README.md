@@ -19,7 +19,7 @@
 Панель 3X-UI, все протоколы на порту 443 и одна подписка на всё:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/refs/heads/main/scripts/3x-ui.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/adminxp/3X-UI_KIT/v1.2.1/scripts/3x-ui.sh)
 ```
 
 Через пару минут скрипт покажет адрес панели, логин, пароль и подписку с QR-кодом.
